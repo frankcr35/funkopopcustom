@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gracias por tu compra | Funko Pops Custom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,400;0,600&family=Source+Serif+4:ital,wght@0,400;0,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="container header__content">
+        <a href="{{ url_for('home') }}" class="header__brand">
+          <img src="{{ logo_url }}" alt="Funko Pops Custom" class="header__logo-img" width="48" height="48" />
+          <div>
+            <span class="header__title">Funko Pops Custom</span>
+            <span class="header__subtitle">Artesanía hecha a mano</span>
+          </div>
+        </a>
+      </div>
+    </header>
+    <main class="section">
+      <div class="container container--narrow thankyou">
+        <h1 class="page-title">Gracias por tu compra</h1>
+        <p>El pago se ha realizado correctamente. Recibirás un correo de confirmación y prepararemos tu encargo con cuidado.</p>
+        <p><a href="{{ url_for('home') }}" class="button">Volver al inicio</a></p>
+      </div>
+    </main>
+    <footer class="footer">
+      <div class="container footer__content">
+        <p>© 2025 Funko Pops Custom.</p>
+      </div>
+    </footer>
+  </body>
+</html>

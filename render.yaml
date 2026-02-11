@@ -1,0 +1,16 @@
+# Render Blueprint: despliegue de la tienda Flask
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: funkopopcustom
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      # Añade en el Dashboard de Render (Environment):
+      # SECRET_KEY = una clave aleatoria larga
+      # STRIPE_SECRET_KEY = sk_live_... o sk_test_... (Stripe)
+      # MAIL_USERNAME = tu email (para enviar la ficha)
+      # MAIL_PASSWORD = contraseña de aplicación del email

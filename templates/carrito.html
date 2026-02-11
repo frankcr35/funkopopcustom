@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Carrito | Funko Pops Custom</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,400;0,600&family=Source+Serif+4:ital,wght@0,400;0,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="container header__content">
+        <a href="{{ url_for('home') }}" class="header__brand">
+          <img src="{{ logo_url }}" alt="Funko Pops Custom" class="header__logo-img" width="48" height="48" />
+          <div>
+            <span class="header__title">Funko Pops Custom</span>
+            <span class="header__subtitle">Artesanía hecha a mano</span>
+          </div>
+        </a>
+        <nav class="nav">
+          <a href="{{ url_for('home') }}#diseños" class="button button--ghost">Seguir comprando</a>
+        </nav>
+      </div>
+    </header>
+    <main class="section">
+      <div class="container">
+        <h1 class="page-title">Tu carrito</h1>
+        {% if items %}
+        <ul class="cart-list">
+          {% for item in items %}
+          <li class="cart-item">
+            <div class="cart-item__content">
+              {% if item.tipo == 'producto' %}
+              <strong>{{ item.nombre }}</strong>
+              <p class="cart-item__meta">Figura personalizada según categoría</p>
+              {% else %}
+              <strong>Encargo personalizado</strong>
+              <span class="cart-item__diseño">{{ item.diseño or 'Diseño a elegir' }}</span>
+              <p class="cart-item__desc">{{ item.descripcion[:120] if item.descripcion else '' }}{% if item.descripcion and item.descripcion|length > 120 %}…{% endif %}</p>
+              <p class="cart-item__envio">Envío a: {{ item.nombre }}, {{ item.direccion }}, {{ item.cp }} {{ item.ciudad }}, {{ item.pais }}</p>
+              {% endif %}
+            </div>
+            <div class="cart-item__right">
+              <span class="cart-item__price">{{ item.precio }} €</span>
+              <form action="{{ url_for('carrito_quitar', index=loop.index0) }}" method="post" class="cart-item__remove">
+                <button type="submit" class="btn-remove" aria-label="Quitar del carrito">Eliminar</button>
+              </form>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        <div class="cart-total">
+          <strong>Total:</strong> <span class="cart-total__amount">{{ total }} €</span>
+        </div>
+
+        <div class="cart-form-wrap">
+          <div class="cart-form-head">
+            <h2 class="cart-form-title">Datos del encargo</h2>
+            <p class="cart-form-desc">Completa la ficha con tus datos y referencias. Recibirás un correo de confirmación y nosotros prepararemos tu pedido con cuidado.</p>
+          </div>
+          <form action="{{ url_for('carrito_enviar_datos') }}" method="post" enctype="multipart/form-data" class="cart-form">
+            <fieldset class="cart-form-section">
+              <legend class="cart-form-legend">Datos de contacto</legend>
+              <div class="field">
+                <label for="cart_name">Nombre completo</label>
+                <input id="cart_name" name="name" type="text" placeholder="Ej. María García López" required />
+              </div>
+            </fieldset>
+            <fieldset class="cart-form-section">
+              <legend class="cart-form-legend">Tu Funko: descripción y referencias</legend>
+              <div class="field">
+                <label for="cart_details">Descripción del encargo</label>
+                <textarea id="cart_details" name="details" rows="4" placeholder="Describe cómo quieres tu figura: persona o personaje, vestuario, pose, accesorios. Si has usado Gemini, pega aquí el texto o la descripción que generaste." required></textarea>
+              </div>
+              <div class="field field--file">
+                <label for="cart_imagenes">Imágenes de referencia</label>
+                <div class="file-upload-wrap">
+                  <input id="cart_imagenes" name="imagenes" type="file" accept="image/*" multiple />
+                </div>
+                <span class="field-hint">Formatos aceptados: JPG, PNG. Puedes subir varias imágenes.</span>
+              </div>
+            </fieldset>
+            <fieldset class="cart-form-section">
+              <legend class="cart-form-legend">Dirección de envío</legend>
+              <div class="field">
+                <label for="cart_direccion">Calle, número y piso</label>
+                <input id="cart_direccion" name="direccion" type="text" placeholder="Ej. Calle Mayor 12, 3º B" required />
+              </div>
+              <div class="field field--inline">
+                <div>
+                  <label for="cart_cp">Código postal</label>
+                  <input id="cart_cp" name="cp" type="text" placeholder="Ej. 28001" required />
+                </div>
+                <div>
+                  <label for="cart_ciudad">Ciudad</label>
+                  <input id="cart_ciudad" name="ciudad" type="text" placeholder="Ej. Madrid" required />
+                </div>
+              </div>
+              <div class="field">
+                <label for="cart_pais">País</label>
+                <input id="cart_pais" name="pais" type="text" placeholder="Ej. España" required />
+              </div>
+            </fieldset>
+            <div class="field field--checkbox cart-form-legal">
+              <label><input type="checkbox" required /> He leído y acepto la <a href="#!" class="link">política de privacidad</a> y que mis datos se utilicen para gestionar este encargo.</label>
+            </div>
+            <button type="submit" class="button button--full button--cart button--submit">Enviar datos y continuar al pago</button>
+          </form>
+        </div>
+
+        <div class="cart-actions">
+          <form action="{{ url_for('carrito_vaciar') }}" method="post" style="display:inline;">
+            <button type="submit" class="button button--outline">Vaciar carrito</button>
+          </form>
+          <a href="{{ url_for('checkout') }}" class="button">Ir a pagar sin rellenar ficha</a>
+        </div>
+        {% else %}
+        <p class="cart-empty">No tienes nada en el carrito. <a href="{{ url_for('home') }}#diseños">Elige una categoría</a> y añádela al carrito.</p>
+        {% endif %}
+      </div>
+    </main>
+    <footer class="footer">
+      <div class="container footer__content">
+        <p>© 2025 Funko Pops Custom.</p>
+      </div>
+    </footer>
+  </body>
+</html>

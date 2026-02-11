@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Encargo recibido | Funko Pops Custom</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600&family=Source+Serif+4:ital,wght@0,400;0,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <div class="order-ok">
+      <div class="order-ok__card">
+        <h1>Gracias, {{ name }}</h1>
+        <p>Hemos recibido tu solicitud. Nos pondremos en contacto contigo con el presupuesto y el enlace de pago seguro.</p>
+        {% if diseño %}
+        <p><strong>Diseño elegido:</strong> {{ diseño }}</p>
+        {% endif %}
+        <p><a href="{{ url_for('home') }}" class="button">Volver al inicio</a></p>
+      </div>
+    </div>
+  </body>
+</html>

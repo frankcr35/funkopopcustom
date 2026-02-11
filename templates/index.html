@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Funko Pops Personalizados | Artesanía única</title>
+    <meta name="description" content="Funko Pops personalizados hechos a mano. Diseños exclusivos: bodas, cantantes, custom y películas." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="container header__content">
+        <a href="#inicio" class="header__brand">
+          <img src="{{ logo_url }}" alt="Funko Pops Custom" class="header__logo-img" width="48" height="48" />
+          <div>
+            <span class="header__title">Funko Pops Custom</span>
+            <span class="header__subtitle">Artesanía hecha a mano</span>
+          </div>
+        </a>
+        <nav class="nav" aria-label="Navegación principal">
+          <button class="nav__toggle" aria-label="Abrir menú" id="navToggle"><span></span><span></span></button>
+          <ul class="nav__list" id="navList">
+            <li><a href="#como-funciona">Cómo funciona</a></li>
+            <li><a href="#diseños">Diseños</a></li>
+            <li><a href="#elegir">Descubre nuestro trabajo</a></li>
+          </ul>
+        </nav>
+        <div class="header__right">
+          <a href="https://gemini.google.com" target="_blank" rel="noopener noreferrer" class="header__gemini-btn" aria-label="Abrir Gemini para crear referencia con IA">✨ IA</a>
+          <a href="{{ url_for('carrito') }}" class="header__cart" aria-label="Ver carrito">
+            <span class="header__cart-icon">🛒</span>
+            <span class="header__cart-count" id="cartCount">{{ cart_count }}</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero -->
+      <section id="inicio" class="hero">
+        <div class="container hero__wrap">
+          <div class="hero__col hero__col--img">
+            <div class="hero__image-wrap">
+              <img src="{{ hero_image }}" alt="Funko Pops personalizados" class="hero__image" width="420" height="315" />
+            </div>
+          </div>
+          <div class="hero__col hero__col--text">
+            <h1 class="hero__title">Funko Pops personalizados</h1>
+            <p class="hero__desc">
+              Creamos figuras únicas hechas a mano: novios para tu boda, tu artista favorito, tu mascota, personajes de cine o un diseño 100 % personal. Cada pieza se esculpe, pinta y acaba en nuestro taller.
+            </p>
+            <div class="hero__actions">
+              <a href="#diseños" class="button">Ver diseños</a>
+              <a href="{{ url_for('carrito') }}" class="button button--outline">Ver carrito</a>
+            </div>
+          </div>
+          <div class="hero__col hero__col--video">
+            <div class="hero__video-wrap">
+              <video autoplay muted loop playsinline preload="auto" class="hero__video" aria-label="Vídeo del proceso">
+                <source src="{{ hero_video }}" type="video/mp4" />
+              </video>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cómo funciona -->
+      <section id="como-funciona" class="section section--steps">
+        <div class="container">
+          <header class="section__header">
+            <h2>¿Cómo funciona?</h2>
+            <p>Te lo ponemos muy fácil: en tres pasos tendrás tu Funko en casa.</p>
+          </header>
+          <div class="steps">
+            <div class="step">
+              <span class="step__num">1</span>
+              <h3 class="step__title">Elige y añade al carrito</h3>
+              <p class="step__text">Elige una categoría aquí abajo y añádela al carrito. Si quieres una referencia con IA, usa el botón ✨ IA del encabezado para abrir Gemini en la misma página y genera tu idea. Luego podrás pegarla en la ficha del carrito.</p>
+            </div>
+            <div class="step">
+              <span class="step__num">2</span>
+              <h3 class="step__title">Rellena la ficha en el carrito</h3>
+              <p class="step__text">En el carrito rellena tus datos: descripción del Funko, sube imágenes de referencia si tienes y tu dirección de envío. Esos datos se nos envían por correo y tú pasas al pago.</p>
+            </div>
+            <div class="step">
+              <span class="step__num">3</span>
+              <h3 class="step__title">Paga y te lo enviamos</h3>
+              <p class="step__text">Paga con tarjeta o PayPal y nosotros te enviamos tu figura a casa. Envíos a toda España e internacionales.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Galería -->
+      <section id="diseños" class="section section--cream">
+        <div class="container">
+          <header class="section__header">
+            <h2>Nuestros diseños</h2>
+            <p>Elige una categoría, mira los ejemplos y añade al carrito la que te guste. Cada una tiene su precio.</p>
+          </header>
+          <div class="grupos" id="grupos">
+            {% for grupo in grupos %}
+            <details class="grupo" data-grupo="{{ grupo.id }}"{% if not grupo.resto %} data-sin-resto{% endif %}>
+              <summary class="grupo__portada">
+                <span class="grupo__img-wrap">
+                  <img src="{{ grupo.imagen_principal.url }}" alt="{{ grupo.nombre }}" loading="lazy" width="320" height="320" />
+                  {% if grupo.resto %}<span class="grupo__ver-mas">Ver más</span>{% endif %}
+                </span>
+                <span class="grupo__info">
+                  <span class="grupo__nombre">{{ grupo.nombre }}</span>
+                  <span class="grupo__desc">{{ grupo.descripcion }}</span>
+                  <span class="grupo__precio">{{ grupo.precio }} €</span>
+                  <form action="{{ url_for('carrito_add_product') }}" method="post" class="grupo__add" onclick="event.stopPropagation()">
+                    <input type="hidden" name="grupo_id" value="{{ grupo.id }}" />
+                    <button type="submit" class="button button--small button--cart">Añadir al carrito</button>
+                  </form>
+                </span>
+              </summary>
+              {% if grupo.resto %}
+              <div class="grupo__resto">
+                <p class="grupo__resto-titulo">Más ejemplos de {{ grupo.nombre | lower }}</p>
+                <div class="grupo__galeria">
+                  {% for item in grupo.resto %}
+                  <figure class="grupo__thumb">
+                    <img src="{{ item.url }}" alt="{{ item.titulo }}" loading="lazy" />
+                    <figcaption>{{ item.titulo }}</figcaption>
+                  </figure>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endif %}
+            </details>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+
+      <!-- Elegir diseño -->
+      <section id="elegir" class="section section--sepia">
+        <div class="container">
+          <header class="section__header">
+            <h2>Descubre nuestro trabajo</h2>
+            <p>Selecciona el diseño que más se acerque a lo que quieres para tu encargo personalizado.</p>
+          </header>
+          <div class="picker" id="picker">
+            {% for item in todas_imagenes %}
+            <button type="button" class="picker__card" data-diseño="{{ item.titulo }}" data-url="{{ item.url }}" aria-pressed="false">
+              <span class="picker__img-wrap"><img src="{{ item.url }}" alt="{{ item.titulo }}" loading="lazy" /></span>
+              <span class="picker__label">{{ item.titulo }}</span>
+            </button>
+            {% endfor %}
+          </div>
+          <p class="picker__hint" id="pickerHint">Haz clic en una imagen para seleccionar tu diseño de referencia.</p>
+          <p class="picker__selected" id="pickerSelected" hidden>
+            Diseño elegido: <strong id="pickerSelectedName"></strong>
+            <a href="{{ url_for('carrito') }}" class="link">Ir al carrito →</a>
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__content">
+        <p>© <span id="year"></span> Funko Pops Custom. Artesanía hecha a mano.</p>
+        <div class="footer__links">
+          <a href="#!">Aviso legal</a>
+          <a href="#!">Privacidad</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var navToggle = document.getElementById('navToggle');
+        var navList = document.getElementById('navList');
+        if (navToggle && navList) {
+          navToggle.addEventListener('click', function () { navList.classList.toggle('nav__list--open'); });
+          navList.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', function () { navList.classList.remove('nav__list--open'); });
+          });
+        }
+        var yearSpan = document.getElementById('year');
+        if (yearSpan) yearSpan.textContent = String(new Date().getFullYear());
+
+        var formDiseño = document.getElementById('formDiseño');
+        var pickerHint = document.getElementById('pickerHint');
+        var pickerSelected = document.getElementById('pickerSelected');
+        var pickerSelectedName = document.getElementById('pickerSelectedName');
+        if (document.querySelectorAll('.picker__card').length) {
+          document.querySelectorAll('.picker__card').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+              document.querySelectorAll('.picker__card').forEach(function (b) {
+                b.classList.remove('picker__card--on');
+                b.setAttribute('aria-pressed', 'false');
+              });
+              this.classList.add('picker__card--on');
+              this.setAttribute('aria-pressed', 'true');
+              var nombre = this.getAttribute('data-diseño');
+              if (formDiseño) formDiseño.value = nombre;
+              if (pickerSelectedName) pickerSelectedName.textContent = nombre;
+              if (pickerHint) pickerHint.hidden = true;
+              if (pickerSelected) pickerSelected.hidden = false;
+            });
+          });
+        }
+
+      })();
+    </script>
+  </body>
+</html>
