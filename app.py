@@ -1,3 +1,4 @@
+import base64
 import os
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -11,6 +12,11 @@ try:
     import stripe
 except ImportError:
     stripe = None
+
+try:
+    import resend
+except ImportError:
+    resend = None
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "cambiar-en-produccion-clave-secreta")
@@ -230,15 +236,7 @@ def carrito_quitar(index):
 
 
 def enviar_ficha_por_email(nombre, descripcion, direccion, ciudad, cp, pais, archivos=None):
-    """Envía los datos de la ficha al correo configurado. Requiere MAIL_USERNAME y MAIL_PASSWORD en el entorno."""
-    mail_user = os.environ.get("MAIL_USERNAME")
-    mail_pass = os.environ.get("MAIL_PASSWORD")
-    if not mail_user or not mail_pass:
-        return False, "Correo no configurado (MAIL_USERNAME/MAIL_PASSWORD)"
-    msg = MIMEMultipart()
-    msg["Subject"] = "Nuevo encargo Funko Pops - {}".format(nombre or "Sin nombre")
-    msg["From"] = mail_user
-    msg["To"] = EMAIL_TO
+    """Envía la ficha por Resend (recomendado en Render) o por SMTP (Gmail en local)."""
     cuerpo = (
         "Datos del encargo:\n\n"
         "Nombre: {}\n"
@@ -252,6 +250,47 @@ def enviar_ficha_por_email(nombre, descripcion, direccion, ciudad, cp, pais, arc
         ciudad or "-",
         pais or "-",
     )
+    subject = "Nuevo encargo Funko Pops - {}".format(nombre or "Sin nombre")
+
+    # Resend (API HTTPS): funciona en Render y no depende de SMTP
+    resend_key = os.environ.get("RESEND_API_KEY")
+    if resend and resend_key:
+        try:
+            resend.api_key = resend_key
+            params = {
+                "from": "Funko Pops Custom <onboarding@resend.dev>",
+                "to": [EMAIL_TO],
+                "subject": subject,
+                "text": cuerpo,
+            }
+            adjuntos = []
+            if archivos:
+                for f in archivos:
+                    if f and getattr(f, "filename", None):
+                        try:
+                            data = f.read()
+                            if not data:
+                                continue
+                            safe_name = (f.filename or "adjunto").encode("ascii", "ignore").decode("ascii") or "adjunto"
+                            adjuntos.append({"filename": safe_name, "content": base64.b64encode(data).decode("ascii")})
+                        except Exception:
+                            pass
+            if adjuntos:
+                params["attachments"] = adjuntos
+            resend.Emails.send(params)
+            return True, None
+        except Exception as e:
+            return False, str(e)
+
+    # SMTP (Gmail): solo en entornos donde el puerto 465 no esté bloqueado (p. ej. local)
+    mail_user = os.environ.get("MAIL_USERNAME")
+    mail_pass = os.environ.get("MAIL_PASSWORD")
+    if not mail_user or not mail_pass:
+        return False, "Configura RESEND_API_KEY en Render (resend.com) o MAIL_USERNAME/MAIL_PASSWORD en local."
+    msg = MIMEMultipart()
+    msg["Subject"] = subject
+    msg["From"] = mail_user
+    msg["To"] = EMAIL_TO
     msg.attach(MIMEText(cuerpo, "plain", "utf-8"))
     if archivos:
         for f in archivos:
@@ -269,7 +308,6 @@ def enviar_ficha_por_email(nombre, descripcion, direccion, ciudad, cp, pais, arc
                 except Exception:
                     pass
     try:
-        # Timeout corto para no bloquear el worker si Render bloquea SMTP
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as s:
             s.login(mail_user, mail_pass)
             s.sendmail(mail_user, EMAIL_TO, msg.as_string())
