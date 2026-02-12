@@ -112,7 +112,13 @@
           <form action="{{ url_for('carrito_vaciar') }}" method="post" style="display:inline;">
             <button type="submit" class="button button--outline">Vaciar carrito</button>
           </form>
-          <a href="{{ url_for('checkout') }}" class="button">Ir a pagar sin rellenar ficha</a>
+          {% if stripe_ok %}
+          <form action="{{ url_for('crear_pago') }}" method="post" style="display:inline;">
+            <button type="submit" class="button button--cart button--submit">Pagar con tarjeta (Stripe)</button>
+          </form>
+          {% else %}
+          <a href="{{ url_for('checkout') }}" class="button">Ir a pagar</a>
+          {% endif %}
         </div>
         {% else %}
         <p class="cart-empty">No tienes nada en el carrito. <a href="{{ url_for('home') }}#diseños">Elige una categoría</a> y añádela al carrito.</p>

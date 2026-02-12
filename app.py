@@ -205,11 +205,13 @@ def cart_total(items):
 def carrito():
     items = session.get("carrito", [])
     total = cart_total(items)
+    stripe_ok = stripe is not None and os.environ.get("STRIPE_SECRET_KEY")
     return render_template(
         "carrito.html",
         items=items,
         total=total,
         logo_url=url_imagen(LOGO_IMAGE),
+        stripe_ok=stripe_ok,
     )
 
 
@@ -253,16 +255,19 @@ def enviar_ficha_por_email(nombre, descripcion, direccion, ciudad, cp, pais, arc
     msg.attach(MIMEText(cuerpo, "plain", "utf-8"))
     if archivos:
         for f in archivos:
-            if f and f.filename:
-                part = MIMEBase("application", "octet-stream")
-                part.set_payload(f.read())
-                encoders.encode_base64(part)
-                part.add_header(
-                    "Content-Disposition",
-                    "attachment",
-                    filename=f.filename,
-                )
-                msg.attach(part)
+            if f and getattr(f, "filename", None):
+                try:
+                    data = f.read()
+                    if not data:
+                        continue
+                    part = MIMEBase("application", "octet-stream")
+                    part.set_payload(data)
+                    encoders.encode_base64(part)
+                    safe_name = (f.filename or "adjunto").encode("ascii", "ignore").decode("ascii") or "adjunto"
+                    part.add_header("Content-Disposition", "attachment", filename=safe_name)
+                    msg.attach(part)
+                except Exception:
+                    pass
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as s:
             s.login(mail_user, mail_pass)
@@ -274,20 +279,23 @@ def enviar_ficha_por_email(nombre, descripcion, direccion, ciudad, cp, pais, arc
 
 @app.route("/carrito/enviar-datos", methods=["POST"])
 def carrito_enviar_datos():
-    nombre = request.form.get("name", "")
-    descripcion = request.form.get("details", "")
-    direccion = request.form.get("direccion", "")
-    ciudad = request.form.get("ciudad", "")
-    cp = request.form.get("cp", "")
-    pais = request.form.get("pais", "")
-    archivos = request.files.getlist("imagenes") or []
-    ok, err = enviar_ficha_por_email(
-        nombre, descripcion, direccion, ciudad, cp, pais, archivos
-    )
-    if ok:
-        flash("Datos enviados correctamente. Redirigiendo al pago.")
-    else:
-        flash("No se pudo enviar el correo: {}.".format(err))
+    try:
+        nombre = request.form.get("name", "") or ""
+        descripcion = request.form.get("details", "") or ""
+        direccion = request.form.get("direccion", "") or ""
+        ciudad = request.form.get("ciudad", "") or ""
+        cp = request.form.get("cp", "") or ""
+        pais = request.form.get("pais", "") or ""
+        archivos = request.files.getlist("imagenes") or []
+        ok, err = enviar_ficha_por_email(
+            nombre, descripcion, direccion, ciudad, cp, pais, archivos
+        )
+        if ok:
+            flash("Datos enviados correctamente. Redirigiendo al pago.")
+        else:
+            flash("No se pudo enviar el correo: {}.".format(err), "error")
+    except Exception as e:
+        flash("Error al enviar los datos: {}.".format(str(e)), "error")
     return redirect(url_for("checkout"))
 
 
