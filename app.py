@@ -269,11 +269,12 @@ def enviar_ficha_por_email(nombre, descripcion, direccion, ciudad, cp, pais, arc
                 except Exception:
                     pass
     try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as s:
+        # Timeout corto para no bloquear el worker si Render bloquea SMTP
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as s:
             s.login(mail_user, mail_pass)
             s.sendmail(mail_user, EMAIL_TO, msg.as_string())
         return True, None
-    except Exception as e:
+    except (OSError, smtplib.SMTPException, Exception) as e:
         return False, str(e)
 
 
@@ -293,9 +294,9 @@ def carrito_enviar_datos():
         if ok:
             flash("Datos enviados correctamente. Redirigiendo al pago.")
         else:
-            flash("No se pudo enviar el correo: {}.".format(err), "error")
+            flash("No se pudo enviar el correo: {}. Puedes continuar al pago debajo.".format(err), "error")
     except Exception as e:
-        flash("Error al enviar los datos: {}.".format(str(e)), "error")
+        flash("Error al enviar los datos: {}. Puedes continuar al pago debajo.".format(str(e)), "error")
     return redirect(url_for("checkout"))
 
 
