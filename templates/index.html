@@ -74,6 +74,14 @@
             <h2>¿Cómo funciona?</h2>
             <p>Te lo ponemos muy fácil: en tres pasos tendrás tu Funko en casa.</p>
           </header>
+          {% if instrucciones_imagenes and instrucciones_imagenes|length >= 2 %}
+          <div class="steps-images">
+            <div class="steps-images__wrap">
+              <img src="{{ instrucciones_imagenes[0] }}" alt="Instrucciones paso a paso" class="steps-images__img" loading="lazy" />
+              <img src="{{ instrucciones_imagenes[1] }}" alt="Instrucciones de encargo" class="steps-images__img" loading="lazy" />
+            </div>
+          </div>
+          {% endif %}
           <div class="steps">
             <div class="step">
               <span class="step__num">1</span>

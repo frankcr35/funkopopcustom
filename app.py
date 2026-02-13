@@ -32,7 +32,10 @@ EMAIL_TO = "frankcr35@gmail.com"
 
 LOGO_IMAGE = "imagen principal.jpeg"
 HERO_IMAGE = "imagen principal.jpeg"
-HERO_VIDEO = "WhatsApp Video 2026-01-21 at 15.54.33.mp4"
+HERO_VIDEO = "untitled.mp4"
+
+# Imágenes de la sección "Cómo funciona"
+INSTRUCCIONES_IMAGENES = ["instrucciones1.jpeg", "instrucciones2.jpeg"]
 
 # Grupos de diseños: Funko Pop pareja (bodas), Funko Pop personalizado (agrupa cine/cantantes/custom), Funko Pop con mascota
 GRUPOS = [
@@ -126,6 +129,7 @@ def home():
         todas_imagenes.append({"titulo": g["imagen_principal"]["titulo"], "url": g["imagen_principal"]["url"]})
         for it in g["resto"]:
             todas_imagenes.append(it)
+    instrucciones_urls = [url_imagen(f) for f in INSTRUCCIONES_IMAGENES]
     return render_template(
         "index.html",
         hero_image=hero_img_url,
@@ -133,6 +137,7 @@ def home():
         logo_url=logo_url,
         grupos=grupos,
         todas_imagenes=todas_imagenes,
+        instrucciones_imagenes=instrucciones_urls,
         cart_count=len(session.get("carrito", [])),
     )
 

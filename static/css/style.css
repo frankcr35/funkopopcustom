@@ -367,12 +367,43 @@ textarea {
 
 .hero__video {
   width: 100%;
+  height: auto;
   display: block;
-  aspect-ratio: 16/9;
-  object-fit: cover;
+  object-fit: contain;
+  vertical-align: middle;
 }
 
-/* ----- Cómo funciona (3 pasos) ----- */
+/* ----- Cómo funciona: 2 imágenes + 3 pasos ----- */
+.steps-images {
+  margin-bottom: 2rem;
+}
+
+.steps-images__wrap {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.steps-images__img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow);
+  object-fit: contain;
+  background: var(--bg-sepia);
+}
+
+@media (max-width: 520px) {
+  .steps-images__wrap {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
 .steps {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

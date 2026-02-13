@@ -1,0 +1,17 @@
+Archivos que debe contener esta carpeta para que la tienda funcione al 100%:
+
+OBLIGATORIOS (diseños y hero):
+- imagen principal.jpeg  (logo y hero)
+- boda.jpeg, boda 2.jpeg, boda 3.jpeg, boda 4.jpeg
+- custom.jpeg, custom 2.jpeg, custom 3.jpeg, custom 10 .jpeg, custom con mascota.jpeg
+- custom movie.jpeg, custom movie 2.jpeg
+- cantante 2.jpeg, cantante 4.jpeg, cantante 7.jpeg, cantante 8 .jpeg, cantante 9.jpeg, cantante 12.jpeg
+- cantante red.jpeg, cantante red 2.jpeg, cantante red 3.jpeg, cantante red 5.jpeg, cantante red 6.jpeg, cantante red 7.jpeg
+- movie 8.jpeg
+- untitled.mp4  (vídeo del hero; nombre configurado en HERO_VIDEO en app.py)
+
+SECCIÓN "CÓMO FUNCIONA" (2 imágenes):
+- instrucciones1.jpeg
+- instrucciones2.jpeg
+
+Si añades estos dos archivos aquí, se mostrarán automáticamente en la sección "¿Cómo funciona?".
