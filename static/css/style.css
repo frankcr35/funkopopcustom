@@ -407,8 +407,22 @@ textarea {
 
 @media (max-width: 520px) {
   .steps-images__wrap {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    grid-template-columns: unset;
     gap: 1rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+
+  .steps-images__img {
+    flex: 0 0 auto;
+    min-width: min(85vw, 260px);
+    scroll-snap-align: start;
   }
 }
 
@@ -1645,7 +1659,7 @@ details.grupo[open] .grupo__resto {
     padding: 1.5rem 0 2rem;
   }
 
-  /* En móvil muy estrecho, hero en una columna para legibilidad */
+  /* En móvil muy estrecho, hero en una columna (zona vertical, como pedido) */
   .hero__wrap {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
@@ -1681,12 +1695,55 @@ details.grupo[open] .grupo__resto {
     max-width: 100%;
   }
 
+  /* Cómo funciona: fila horizontal con scroll en móvil (tipo iPhone) */
   .steps {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    grid-template-columns: unset;
+    gap: 1rem;
+    margin-top: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.5rem;
   }
 
+  .steps::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .step {
+    flex: 0 0 auto;
+    min-width: min(85vw, 300px);
+    scroll-snap-align: start;
+    text-align: center;
+    padding: 1.25rem 0.75rem;
+  }
+
+  /* Nuestros diseños: fila horizontal con scroll en móvil */
   .grupos {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    grid-template-columns: unset;
+    gap: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.5rem;
+  }
+
+  .grupos::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .grupo {
+    flex: 0 0 auto;
+    min-width: min(85vw, 280px);
+    scroll-snap-align: start;
   }
 
   .picker {
