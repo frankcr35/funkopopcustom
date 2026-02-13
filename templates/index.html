@@ -120,20 +120,46 @@
                 </span>
               </summary>
               {% if grupo.resto %}
-              <div class="grupo__resto">
-                <p class="grupo__resto-titulo">Más ejemplos de {{ grupo.nombre | lower }}</p>
-                <div class="grupo__galeria">
-                  {% for item in grupo.resto %}
-                  <figure class="grupo__thumb">
-                    <img src="{{ item.url }}" alt="{{ item.titulo }}" loading="lazy" />
-                    <figcaption>{{ item.titulo }}</figcaption>
-                  </figure>
-                  {% endfor %}
+              <div class="grupo__resto" id="resto-{{ grupo.id }}">
+                <div class="grupo__resto-backdrop" aria-hidden="true"></div>
+                <div class="grupo__resto-panel">
+                  <button type="button" class="grupo__resto-cerrar" aria-label="Cerrar">×</button>
+                  <p class="grupo__galeria-hint">Elige una miniatura para verla arriba; haz clic en la imagen grande para verla a pantalla completa.</p>
+                  <div class="grupo__grande-wrap">
+                    <img class="grupo__grande grupo__grande--lightbox" src="{{ grupo.imagen_principal.url }}" alt="{{ grupo.imagen_principal.titulo }}" data-imagenes='{{ grupo.todas_urls | tojson }}' data-titulos='{{ grupo.todas_titulos | tojson }}' data-url="{{ grupo.imagen_principal.url }}" data-titulo="{{ grupo.imagen_principal.titulo }}" />
+                  </div>
+                  <div class="grupo__galeria" role="list">
+                    <figure class="grupo__thumb grupo__thumb--selector grupo__thumb--activo" data-url="{{ grupo.imagen_principal.url }}" data-titulo="{{ grupo.imagen_principal.titulo }}" data-imagenes='{{ grupo.todas_urls | tojson }}' data-titulos='{{ grupo.todas_titulos | tojson }}'>
+                      <img src="{{ grupo.imagen_principal.url }}" alt="{{ grupo.imagen_principal.titulo }}" loading="lazy" />
+                      <figcaption>{{ grupo.imagen_principal.titulo }}</figcaption>
+                    </figure>
+                    {% for item in grupo.resto %}
+                    <figure class="grupo__thumb grupo__thumb--selector" data-url="{{ item.url }}" data-titulo="{{ item.titulo }}" data-imagenes='{{ grupo.todas_urls | tojson }}' data-titulos='{{ grupo.todas_titulos | tojson }}'>
+                      <img src="{{ item.url }}" alt="{{ item.titulo }}" loading="lazy" />
+                      <figcaption>{{ item.titulo }}</figcaption>
+                    </figure>
+                    {% endfor %}
+                  </div>
                 </div>
               </div>
               {% endif %}
             </details>
             {% endfor %}
+          </div>
+
+          <!-- Visor de fotos en grande (lightbox) -->
+          <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Ver imagen en grande" hidden>
+            <div class="lightbox__backdrop" id="lightboxBackdrop"></div>
+            <div class="lightbox__content">
+              <button type="button" class="lightbox__close" id="lightboxClose" aria-label="Cerrar">×</button>
+              <button type="button" class="lightbox__prev" id="lightboxPrev" aria-label="Anterior">‹</button>
+              <div class="lightbox__img-wrap">
+                <img class="lightbox__img" id="lightboxImg" src="" alt="" />
+              </div>
+              <button type="button" class="lightbox__next" id="lightboxNext" aria-label="Siguiente">›</button>
+              <p class="lightbox__caption" id="lightboxCaption"></p>
+              <p class="lightbox__counter" id="lightboxCounter"></p>
+            </div>
           </div>
         </div>
       </section>
@@ -206,6 +232,114 @@
             });
           });
         }
+
+        // Lightbox: abrir visor de fotos en grande al hacer clic en portada o en una miniatura
+        var lightbox = document.getElementById('lightbox');
+        var lightboxImg = document.getElementById('lightboxImg');
+        var lightboxCaption = document.getElementById('lightboxCaption');
+        var lightboxCounter = document.getElementById('lightboxCounter');
+        var lightboxClose = document.getElementById('lightboxClose');
+        var lightboxBackdrop = document.getElementById('lightboxBackdrop');
+        var lightboxPrev = document.getElementById('lightboxPrev');
+        var lightboxNext = document.getElementById('lightboxNext');
+
+        var lightboxImagenes = [];
+        var lightboxTitulos = [];
+        var lightboxIdx = 0;
+
+        function openLightbox(url, titulo, imagenes, titulos) {
+          lightboxImagenes = typeof imagenes === 'string' ? JSON.parse(imagenes) : imagenes;
+          lightboxTitulos = typeof titulos === 'string' ? JSON.parse(titulos) : titulos;
+          lightboxIdx = lightboxImagenes.indexOf(url);
+          if (lightboxIdx < 0) lightboxIdx = 0;
+          updateLightboxImage();
+          if (lightbox) {
+            lightbox.removeAttribute('hidden');
+            lightbox.classList.add('lightbox--open');
+            document.body.style.overflow = 'hidden';
+          }
+        }
+
+        function closeLightbox() {
+          if (lightbox) {
+            lightbox.setAttribute('hidden', '');
+            lightbox.classList.remove('lightbox--open');
+            document.body.style.overflow = '';
+          }
+        }
+
+        function updateLightboxImage() {
+          if (!lightboxImagenes.length) return;
+          lightboxIdx = (lightboxIdx + lightboxImagenes.length) % lightboxImagenes.length;
+          var url = lightboxImagenes[lightboxIdx];
+          var titulo = lightboxTitulos[lightboxIdx] || '';
+          if (lightboxImg) { lightboxImg.src = url; lightboxImg.alt = titulo; }
+          if (lightboxCaption) lightboxCaption.textContent = titulo;
+          if (lightboxCounter) lightboxCounter.textContent = (lightboxIdx + 1) + ' / ' + lightboxImagenes.length;
+          if (lightboxPrev) lightboxPrev.style.visibility = lightboxImagenes.length > 1 ? 'visible' : 'hidden';
+          if (lightboxNext) lightboxNext.style.visibility = lightboxImagenes.length > 1 ? 'visible' : 'hidden';
+        }
+
+        document.querySelectorAll('.grupo__thumb--lightbox').forEach(function (thumb) {
+          thumb.addEventListener('click', function () {
+            var url = this.getAttribute('data-url');
+            var titulo = this.getAttribute('data-titulo');
+            var imgs = this.getAttribute('data-imagenes');
+            var titulos = this.getAttribute('data-titulos');
+            if (url && imgs) openLightbox(url, titulo, imgs, titulos);
+          });
+        });
+
+        document.querySelectorAll('.grupo__thumb--selector').forEach(function (thumb) {
+          thumb.addEventListener('click', function (e) {
+            e.preventDefault();
+            var grupo = this.closest('.grupo');
+            if (!grupo) return;
+            var grande = grupo.querySelector('.grupo__grande');
+            var url = this.getAttribute('data-url');
+            var titulo = this.getAttribute('data-titulo');
+            var imgs = this.getAttribute('data-imagenes');
+            var titulos = this.getAttribute('data-titulos');
+            if (grande && url) {
+              grande.src = url;
+              grande.alt = titulo || '';
+              grande.setAttribute('data-url', url);
+              grande.setAttribute('data-titulo', titulo || '');
+              if (imgs) grande.setAttribute('data-imagenes', imgs);
+              if (titulos) grande.setAttribute('data-titulos', titulos);
+            }
+            grupo.querySelectorAll('.grupo__thumb--selector').forEach(function (t) { t.classList.remove('grupo__thumb--activo'); });
+            this.classList.add('grupo__thumb--activo');
+          });
+        });
+
+        document.querySelectorAll('.grupo__grande--lightbox').forEach(function (grande) {
+          grande.addEventListener('click', function () {
+            var url = this.getAttribute('data-url') || this.src;
+            var titulo = this.getAttribute('data-titulo');
+            var imgs = this.getAttribute('data-imagenes');
+            var titulos = this.getAttribute('data-titulos');
+            if (url && imgs) openLightbox(url, titulo, imgs, titulos);
+          });
+        });
+
+        document.querySelectorAll('.grupo__resto-backdrop, .grupo__resto-cerrar').forEach(function (el) {
+          el.addEventListener('click', function () {
+            var details = this.closest('details.grupo');
+            if (details) details.removeAttribute('open');
+          });
+        });
+
+        if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+        if (lightboxBackdrop) lightboxBackdrop.addEventListener('click', closeLightbox);
+        if (lightboxPrev) lightboxPrev.addEventListener('click', function () { lightboxIdx--; updateLightboxImage(); });
+        if (lightboxNext) lightboxNext.addEventListener('click', function () { lightboxIdx++; updateLightboxImage(); });
+        document.addEventListener('keydown', function (e) {
+          if (!lightbox || !lightbox.classList.contains('lightbox--open')) return;
+          if (e.key === 'Escape') closeLightbox();
+          if (e.key === 'ArrowLeft') { lightboxIdx--; updateLightboxImage(); }
+          if (e.key === 'ArrowRight') { lightboxIdx++; updateLightboxImage(); }
+        });
 
       })();
     </script>

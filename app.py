@@ -34,14 +34,14 @@ LOGO_IMAGE = "imagen principal.jpeg"
 HERO_IMAGE = "imagen principal.jpeg"
 HERO_VIDEO = "WhatsApp Video 2026-01-21 at 15.54.33.mp4"
 
-# Precios: bodas 160€, cantantes 80€, otras individuales 80€, figura con mascota 100€
+# Grupos de diseños: Funko Pop pareja (bodas), Funko Pop personalizado (agrupa cine/cantantes/custom), Funko Pop con mascota
 GRUPOS = [
     {
         "id": "bodas",
-        "nombre": "Bodas",
+        "nombre": "Funko Pop pareja",
         "precio": 160,
         "descripcion": "Figuras de novios para el día de tu boda. Detalles únicos y vestuario a medida.",
-        "imagen_principal": {"archivo": "boda.jpeg", "titulo": "Bodas"},
+        "imagen_principal": {"archivo": "boda.jpeg", "titulo": "Funko Pop pareja"},
         "resto": [
             {"archivo": "boda 2.jpeg", "titulo": "Pareja de novios"},
             {"archivo": "boda 3.jpeg", "titulo": "Detalle boda"},
@@ -49,67 +49,38 @@ GRUPOS = [
         ],
     },
     {
-        "id": "cantantes",
-        "nombre": "Cantantes",
+        "id": "personalizado",
+        "nombre": "Funko Pop personalizado",
         "precio": 80,
-        "descripcion": "Tu artista favorito o tú como estrella del escenario. Poses y estilos de música.",
-        "imagen_principal": {"archivo": "cantante 2.jpeg", "titulo": "Cantantes"},
+        "descripcion": "Cantantes, cine, películas, alfombra roja o custom a tu medida. Diseño único como tú quieras.",
+        "imagen_principal": {"archivo": "custom.jpeg", "titulo": "Funko Pop personalizado"},
         "resto": [
+            {"archivo": "cantante 2.jpeg", "titulo": "Cantantes"},
             {"archivo": "cantante 4.jpeg", "titulo": "Edición música"},
             {"archivo": "cantante 7.jpeg", "titulo": "Personalizado"},
             {"archivo": "cantante 8 .jpeg", "titulo": "Cantante exclusivo"},
             {"archivo": "cantante 9.jpeg", "titulo": "Figura escenario"},
             {"archivo": "cantante 12.jpeg", "titulo": "Colección música"},
-        ],
-    },
-    {
-        "id": "cantantes-red",
-        "nombre": "Cantantes alfombra roja",
-        "precio": 80,
-        "descripcion": "Edición gala y premios. Looks de alfombra roja y eventos especiales.",
-        "imagen_principal": {"archivo": "cantante red.jpeg", "titulo": "Alfombra roja"},
-        "resto": [
+            {"archivo": "cantante red.jpeg", "titulo": "Alfombra roja"},
             {"archivo": "cantante red 2.jpeg", "titulo": "Estrella"},
             {"archivo": "cantante red 3.jpeg", "titulo": "Gala"},
             {"archivo": "cantante red 5.jpeg", "titulo": "Premios"},
             {"archivo": "cantante red 6.jpeg", "titulo": "Exclusivo"},
             {"archivo": "cantante red 7.jpeg", "titulo": "Edición limitada"},
-        ],
-    },
-    {
-        "id": "custom",
-        "nombre": "Custom a tu medida",
-        "precio": 80,
-        "descripcion": "Diseños únicos a tu medida: temática personal o lo que imagines.",
-        "imagen_principal": {"archivo": "custom.jpeg", "titulo": "Custom único"},
-        "resto": [
             {"archivo": "custom 2.jpeg", "titulo": "A tu medida"},
             {"archivo": "custom 3.jpeg", "titulo": "Personalizado"},
             {"archivo": "custom 10 .jpeg", "titulo": "Artesanal"},
+            {"archivo": "custom movie.jpeg", "titulo": "Inspiración cine"},
+            {"archivo": "custom movie 2.jpeg", "titulo": "Película"},
+            {"archivo": "movie 8.jpeg", "titulo": "Edición cine"},
         ],
     },
     {
         "id": "custom-mascota",
-        "nombre": "Custom con mascota",
+        "nombre": "Funko Pop con mascota",
         "precio": 100,
         "descripcion": "Figura personalizada que incluye tu mascota. Incluye persona + mascota.",
-        "imagen_principal": {"archivo": "custom con mascota.jpeg", "titulo": "Con mascota"},
-        "resto": [],
-    },
-    {
-        "id": "custom-cine",
-        "nombre": "Custom cine",
-        "precio": 80,
-        "descripcion": "Inspirados en películas y personajes. Tu escena favorita en figura.",
-        "imagen_principal": {"archivo": "custom movie.jpeg", "titulo": "Inspiración cine"},
-        "resto": [{"archivo": "custom movie 2.jpeg", "titulo": "Película"}],
-    },
-    {
-        "id": "películas",
-        "nombre": "Películas",
-        "precio": 80,
-        "descripcion": "Edición cine. Personajes y momentos icónicos hechos a mano.",
-        "imagen_principal": {"archivo": "movie 8.jpeg", "titulo": "Edición cine"},
+        "imagen_principal": {"archivo": "custom con mascota.jpeg", "titulo": "Funko Pop con mascota"},
         "resto": [],
     },
 ]
@@ -121,6 +92,12 @@ def url_imagen(archivo):
 
 def preparar_grupo(g):
     principal = g["imagen_principal"]
+    resto = [
+        {"titulo": it["titulo"], "url": url_imagen(it["archivo"])}
+        for it in g["resto"]
+    ]
+    todas_urls = [url_imagen(principal["archivo"])] + [r["url"] for r in resto]
+    todas_titulos = [principal["titulo"]] + [r["titulo"] for r in resto]
     return {
         "id": g["id"],
         "nombre": g["nombre"],
@@ -130,10 +107,9 @@ def preparar_grupo(g):
             "titulo": principal["titulo"],
             "url": url_imagen(principal["archivo"]),
         },
-        "resto": [
-            {"titulo": it["titulo"], "url": url_imagen(it["archivo"])}
-            for it in g["resto"]
-        ],
+        "resto": resto,
+        "todas_urls": todas_urls,
+        "todas_titulos": todas_titulos,
     }
 
 
