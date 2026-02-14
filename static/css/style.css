@@ -1647,24 +1647,22 @@ details.grupo[open] .grupo__resto {
     padding: 0.75rem 0 1rem;
   }
 
-  /* Primera sección: 1) Imagen  2) Título  3) Descripción (izq) + Vídeo (dcha, mismo tamaño y forma que la imagen) */
+  /* Primera sección: fila 1 = [Imagen] [Título]; fila 2 = [Descripción] [Vídeo mismo tamaño que imagen] */
   .hero__wrap {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto auto auto;
+    grid-template-rows: auto auto auto;
     gap: 0.5rem 0.6rem;
   }
 
   .hero__col--img {
-    grid-column: 1 / -1;
+    grid-column: 1;
     grid-row: 1;
   }
 
-  /* Foto principal: cuadrada, mismo tamaño que en "Cómo funciona" */
+  /* Foto principal: ocupa toda la columna izquierda, cuadrada */
   .hero__col--img .hero__image-wrap {
-    width: 48%;
-    max-width: 175px;
+    width: 100%;
     aspect-ratio: 1;
-    margin: 0 auto;
     overflow: hidden;
     border-radius: var(--radius-lg);
   }
@@ -1679,17 +1677,21 @@ details.grupo[open] .grupo__resto {
     display: contents;
   }
 
+  /* Título a la derecha de la imagen */
   .hero__title {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    font-size: 1.15rem;
-    margin: 0 0 0.25rem;
-    text-align: center;
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 1.1rem;
+    margin: 0;
+    padding-left: 0.4rem;
+    display: flex;
+    align-items: center;
+    text-align: left;
   }
 
   .hero__desc {
     grid-column: 1;
-    grid-row: 3;
+    grid-row: 2;
     font-size: 0.75rem;
     line-height: 1.35;
     margin: 0;
@@ -1698,7 +1700,7 @@ details.grupo[open] .grupo__resto {
 
   .hero__actions {
     grid-column: 1;
-    grid-row: 4;
+    grid-row: 3;
     gap: 0.4rem;
     margin-top: 0.35rem;
   }
@@ -1708,16 +1710,15 @@ details.grupo[open] .grupo__resto {
     padding: 0.35rem 0.5rem;
   }
 
-  /* Vídeo: al lado de descripción, mismo tamaño y forma que la imagen (cuadrado) */
+  /* Vídeo: misma columna que el título, mismo tamaño que la imagen (100% columna, cuadrado) */
   .hero__col--video {
     grid-column: 2;
-    grid-row: 3 / 5;
+    grid-row: 2 / 4;
     align-self: start;
   }
 
   .hero__col--video .hero__video-wrap {
-    width: 48%;
-    max-width: 175px;
+    width: 100%;
     aspect-ratio: 1;
     margin: 0;
     border: none;
