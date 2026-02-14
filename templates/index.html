@@ -29,6 +29,8 @@
           </ul>
         </nav>
         <div class="header__right">
+          <button type="button" class="header__lang-btn" id="langBtn" aria-label="Elegir idioma">🌐 Idioma</button>
+          <div id="google_translate_element" class="header__translate" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;" aria-hidden="true"></div>
           <a href="https://gemini.google.com" target="_blank" rel="noopener noreferrer" class="header__gemini-btn" aria-label="Abrir Gemini para crear referencia con IA">✨ IA</a>
           <a href="{{ url_for('carrito') }}" class="header__cart" aria-label="Ver carrito">
             <span class="header__cart-icon">🛒</span>
@@ -196,6 +198,30 @@
       </section>
     </main>
 
+    <!-- Modal: ¿En qué idioma prefieres ver la página? (10 idiomas más hablados) -->
+    <div class="lang-modal" id="langModal" role="dialog" aria-modal="true" aria-labelledby="langModalTitle" aria-hidden="true">
+      <div class="lang-modal__box">
+        <h2 class="lang-modal__title" id="langModalTitle">¿En qué idioma prefieres ver la página?</h2>
+        <ul class="lang-modal__list" id="langModalList">
+          <li><button type="button" data-lang="es">Español</button></li>
+          <li><button type="button" data-lang="en">English</button></li>
+          <li><button type="button" data-lang="zh-CN">中文 (Chino)</button></li>
+          <li><button type="button" data-lang="hi">हिन्दी (Hindi)</button></li>
+          <li><button type="button" data-lang="fr">Français</button></li>
+          <li><button type="button" data-lang="ar">العربية (Árabe)</button></li>
+          <li><button type="button" data-lang="bn">বাংলা (Bengalí)</button></li>
+          <li><button type="button" data-lang="pt">Português</button></li>
+          <li><button type="button" data-lang="ru">Русский (Ruso)</button></li>
+          <li><button type="button" data-lang="ja">日本語 (Japonés)</button></li>
+          <li><button type="button" data-lang="de">Deutsch (Alemán)</button></li>
+          <li><button type="button" data-lang="it">Italiano</button></li>
+          <li><button type="button" data-lang="nl">Nederlands (Neerlandés)</button></li>
+          <li><button type="button" data-lang="pl">Polski (Polaco)</button></li>
+        </ul>
+        <button type="button" class="lang-modal__skip" id="langModalSkip">Continuar en español</button>
+      </div>
+    </div>
+
     <footer class="footer">
       <div class="container footer__content">
         <p>© <span id="year"></span> Funko Pops Custom. Artesanía hecha a mano.</p>
@@ -349,6 +375,92 @@
           if (e.key === 'ArrowRight') { lightboxIdx++; updateLightboxImage(); }
         });
 
+      })();
+    </script>
+
+    <!-- Traductor: 10 idiomas más hablados + pregunta al entrar -->
+    <script>
+      (function () {
+        var LANG_STORAGE = 'tienda_lang_asked';
+        var modal = document.getElementById('langModal');
+        var langBtn = document.getElementById('langBtn');
+        var langList = document.getElementById('langModalList');
+        var langSkip = document.getElementById('langModalSkip');
+
+        function openLangModal() {
+          if (modal) {
+            modal.classList.add('lang-modal--open');
+            modal.setAttribute('aria-hidden', 'false');
+          }
+        }
+
+        function closeLangModal() {
+          if (modal) {
+            modal.classList.remove('lang-modal--open');
+            modal.setAttribute('aria-hidden', 'true');
+          }
+        }
+
+        function setTranslateLanguage(langCode) {
+          try {
+            var select = document.querySelector('.goog-te-combo');
+            if (select && select.options) {
+              for (var i = 0; i < select.options.length; i++) {
+                var opt = select.options[i];
+                if (opt.value && opt.value.indexOf(langCode) === 0) {
+                  select.value = opt.value;
+                  select.dispatchEvent(new Event('change'));
+                  break;
+                }
+              }
+            }
+          } catch (e) {}
+        }
+
+        function googleTranslateElementInit() {
+          if (typeof google !== 'undefined' && google.translate) {
+            new google.translate.TranslateElement(
+              {
+                pageLanguage: 'es',
+                includedLanguages: 'en,zh-CN,hi,es,fr,ar,bn,pt,ru,ja,de,it,nl,pl',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+              },
+              'google_translate_element'
+            );
+          }
+          if (!sessionStorage.getItem(LANG_STORAGE)) {
+            openLangModal();
+          }
+        }
+
+        if (langList) {
+          langList.addEventListener('click', function (e) {
+            var btn = e.target.closest('button[data-lang]');
+            if (btn) {
+              var lang = btn.getAttribute('data-lang');
+              sessionStorage.setItem(LANG_STORAGE, '1');
+              if (lang !== 'es') setTranslateLanguage(lang);
+              closeLangModal();
+            }
+          });
+        }
+        if (langSkip) {
+          langSkip.addEventListener('click', function () {
+            sessionStorage.setItem(LANG_STORAGE, '1');
+            closeLangModal();
+          });
+        }
+        if (langBtn) langBtn.addEventListener('click', openLangModal);
+
+        modal.addEventListener('click', function (e) {
+          if (e.target === modal) closeLangModal();
+        });
+
+        var script = document.createElement('script');
+        script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        script.async = true;
+        document.head.appendChild(script);
       })();
     </script>
   </body>

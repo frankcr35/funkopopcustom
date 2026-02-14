@@ -1647,60 +1647,16 @@ details.grupo[open] .grupo__resto {
     padding: 0.75rem 0 1rem;
   }
 
+  /* Primera sección: imagen arriba; debajo descripción a la izquierda y vídeo a la derecha */
   .hero__wrap {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    gap: 0.6rem;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 0.5rem 0.6rem;
   }
 
   .hero__col--img {
-    grid-column: 1;
-    grid-row: auto;
-  }
-
-  .hero__col--text {
-    grid-column: 1;
-    grid-row: auto;
-    order: -1;
-    padding: 0;
-  }
-
-  .hero__title {
-    font-size: 1.25rem;
-    margin-bottom: 0.35rem;
-  }
-
-  .hero__desc {
-    font-size: 0.8rem;
-    line-height: 1.35;
-  }
-
-  .hero__actions {
-    gap: 0.5rem;
-  }
-
-  .hero__actions .button {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.6rem;
-  }
-
-  .hero__col--video {
-    grid-column: 1;
-    grid-row: auto;
-  }
-
-  /* Vídeo: se ve entero, sin recortar */
-  .hero__col--video .hero__video-wrap {
-    max-width: 100%;
-    margin: 0 auto;
-  }
-
-  .hero__col--video .hero__video {
-    width: 100%;
-    height: auto;
-    max-height: 240px;
-    object-fit: contain;
-    display: block;
+    grid-column: 1 / -1;
+    grid-row: 1;
   }
 
   /* Foto principal: cuadrada y del mismo tamaño que las imágenes de "Cómo funciona" */
@@ -1719,6 +1675,61 @@ details.grupo[open] .grupo__resto {
     object-fit: cover;
   }
 
+  .hero__col--text {
+    grid-column: 1;
+    grid-row: 2;
+    order: 0;
+    padding: 0;
+    padding-right: 0.4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .hero__title {
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .hero__desc {
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+
+  .hero__actions {
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+  }
+
+  .hero__actions .button {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .hero__col--video {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  /* Vídeo: al lado de la descripción, espacio justo, sin bordes */
+  .hero__col--video .hero__video-wrap {
+    max-width: 100%;
+    margin: 0;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .hero__col--video .hero__video {
+    width: 100%;
+    height: auto;
+    max-height: 220px;
+    object-fit: contain;
+    display: block;
+  }
+
   .hero__visual {
     flex-direction: column;
   }
@@ -1726,6 +1737,15 @@ details.grupo[open] .grupo__resto {
   .hero__image-wrap,
   .hero__video-wrap {
     max-width: 100%;
+  }
+
+  /* Descubre nuestro trabajo: en móvil las imágenes no se agrandan al tocar/pasar el dedo */
+  .picker__card:hover .picker__img-wrap img {
+    transform: none;
+  }
+
+  .picker__card:hover .picker__img-wrap {
+    overflow: hidden;
   }
 
   .section {
@@ -1846,4 +1866,133 @@ details.grupo[open] .grupo__resto {
   .picker__label {
     font-size: 0.6rem;
   }
+}
+
+/* ----- Traductor (Google Translate) ----- */
+.header__translate {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.header__translate .goog-te-banner-frame,
+.header__translate .skiptranslate {
+  display: none !important;
+}
+
+body .goog-tooltip,
+body .goog-tooltip:hover {
+  display: none !important;
+}
+
+body top .goog-te-banner-frame {
+  display: none !important;
+}
+
+/* Modal idioma (primera visita y selector) */
+.lang-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(31, 27, 24, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.lang-modal--open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.lang-modal__box {
+  background: var(--paper);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-soft);
+  max-width: 380px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+.lang-modal__title {
+  font-family: var(--font-head);
+  font-size: 1.25rem;
+  margin: 0 0 1rem;
+  color: var(--ink);
+  text-align: center;
+}
+
+.lang-modal__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.lang-modal__list button {
+  display: block;
+  width: 100%;
+  padding: 0.65rem 1rem;
+  text-align: left;
+  background: var(--bg-cream);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--ink);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.lang-modal__list button:hover {
+  background: var(--accent-soft);
+  border-color: var(--gold-muted);
+}
+
+.lang-modal__skip {
+  display: block;
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.lang-modal__skip:hover {
+  color: var(--ink);
+}
+
+/* Botón idioma en header */
+.header__lang-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.8rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.header__lang-btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--gold-muted);
+  color: var(--ink);
+  text-decoration: none;
 }
