@@ -1647,10 +1647,10 @@ details.grupo[open] .grupo__resto {
     padding: 0.75rem 0 1rem;
   }
 
-  /* Primera sección: imagen arriba; debajo descripción a la izquierda y vídeo a la derecha */
+  /* Primera sección: 1) Imagen  2) Título  3) Descripción (izq) + Vídeo (dcha, mismo tamaño y forma que la imagen) */
   .hero__wrap {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto auto;
     gap: 0.5rem 0.6rem;
   }
 
@@ -1659,7 +1659,7 @@ details.grupo[open] .grupo__resto {
     grid-row: 1;
   }
 
-  /* Foto principal: cuadrada y del mismo tamaño que las imágenes de "Cómo funciona" */
+  /* Foto principal: cuadrada, mismo tamaño que en "Cómo funciona" */
   .hero__col--img .hero__image-wrap {
     width: 48%;
     max-width: 175px;
@@ -1676,27 +1676,29 @@ details.grupo[open] .grupo__resto {
   }
 
   .hero__col--text {
-    grid-column: 1;
-    grid-row: 2;
-    order: 0;
-    padding: 0;
-    padding-right: 0.4rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+    display: contents;
   }
 
   .hero__title {
-    font-size: 1.1rem;
-    margin-bottom: 0.25rem;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: 1.15rem;
+    margin: 0 0 0.25rem;
+    text-align: center;
   }
 
   .hero__desc {
+    grid-column: 1;
+    grid-row: 3;
     font-size: 0.75rem;
     line-height: 1.35;
+    margin: 0;
+    padding-right: 0.4rem;
   }
 
   .hero__actions {
+    grid-column: 1;
+    grid-row: 4;
     gap: 0.4rem;
     margin-top: 0.35rem;
   }
@@ -1706,27 +1708,28 @@ details.grupo[open] .grupo__resto {
     padding: 0.35rem 0.5rem;
   }
 
+  /* Vídeo: al lado de descripción, mismo tamaño y forma que la imagen (cuadrado) */
   .hero__col--video {
     grid-column: 2;
-    grid-row: 2;
+    grid-row: 3 / 5;
     align-self: start;
   }
 
-  /* Vídeo: al lado de la descripción, espacio justo, sin bordes */
   .hero__col--video .hero__video-wrap {
-    max-width: 100%;
+    width: 48%;
+    max-width: 175px;
+    aspect-ratio: 1;
     margin: 0;
     border: none;
     box-shadow: none;
-    border-radius: 0;
-    padding: 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
   }
 
   .hero__col--video .hero__video {
     width: 100%;
-    height: auto;
-    max-height: 220px;
-    object-fit: contain;
+    height: 100%;
+    object-fit: cover;
     display: block;
   }
 

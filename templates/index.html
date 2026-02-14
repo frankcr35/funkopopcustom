@@ -29,7 +29,6 @@
           </ul>
         </nav>
         <div class="header__right">
-          <button type="button" class="header__lang-btn" id="langBtn" aria-label="Elegir idioma">🌐 Idioma</button>
           <div id="google_translate_element" class="header__translate" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;" aria-hidden="true"></div>
           <a href="https://gemini.google.com" target="_blank" rel="noopener noreferrer" class="header__gemini-btn" aria-label="Abrir Gemini para crear referencia con IA">✨ IA</a>
           <a href="{{ url_for('carrito') }}" class="header__cart" aria-label="Ver carrito">
@@ -198,30 +197,6 @@
       </section>
     </main>
 
-    <!-- Modal: ¿En qué idioma prefieres ver la página? (10 idiomas más hablados) -->
-    <div class="lang-modal" id="langModal" role="dialog" aria-modal="true" aria-labelledby="langModalTitle" aria-hidden="true">
-      <div class="lang-modal__box">
-        <h2 class="lang-modal__title" id="langModalTitle">¿En qué idioma prefieres ver la página?</h2>
-        <ul class="lang-modal__list" id="langModalList">
-          <li><button type="button" data-lang="es">Español</button></li>
-          <li><button type="button" data-lang="en">English</button></li>
-          <li><button type="button" data-lang="zh-CN">中文 (Chino)</button></li>
-          <li><button type="button" data-lang="hi">हिन्दी (Hindi)</button></li>
-          <li><button type="button" data-lang="fr">Français</button></li>
-          <li><button type="button" data-lang="ar">العربية (Árabe)</button></li>
-          <li><button type="button" data-lang="bn">বাংলা (Bengalí)</button></li>
-          <li><button type="button" data-lang="pt">Português</button></li>
-          <li><button type="button" data-lang="ru">Русский (Ruso)</button></li>
-          <li><button type="button" data-lang="ja">日本語 (Japonés)</button></li>
-          <li><button type="button" data-lang="de">Deutsch (Alemán)</button></li>
-          <li><button type="button" data-lang="it">Italiano</button></li>
-          <li><button type="button" data-lang="nl">Nederlands (Neerlandés)</button></li>
-          <li><button type="button" data-lang="pl">Polski (Polaco)</button></li>
-        </ul>
-        <button type="button" class="lang-modal__skip" id="langModalSkip">Continuar en español</button>
-      </div>
-    </div>
-
     <footer class="footer">
       <div class="container footer__content">
         <p>© <span id="year"></span> Funko Pops Custom. Artesanía hecha a mano.</p>
@@ -378,27 +353,59 @@
       })();
     </script>
 
-    <!-- Traductor: 10 idiomas más hablados + pregunta al entrar -->
+    <!-- Traductor automático según ubicación / idioma del navegador -->
     <script>
       (function () {
-        var LANG_STORAGE = 'tienda_lang_asked';
-        var modal = document.getElementById('langModal');
-        var langBtn = document.getElementById('langBtn');
-        var langList = document.getElementById('langModalList');
-        var langSkip = document.getElementById('langModalSkip');
+        var SUPPORTED = ['en', 'zh-CN', 'hi', 'es', 'fr', 'ar', 'bn', 'pt', 'ru', 'ja', 'de', 'it', 'nl', 'pl'];
+        var COUNTRY_TO_LANG = {
+          'US': 'en', 'GB': 'en', 'AU': 'en', 'CA': 'en', 'IE': 'en', 'NZ': 'en', 'ZA': 'en',
+          'DE': 'de', 'AT': 'de', 'CH': 'de',
+          'FR': 'fr', 'BE': 'fr', 'LU': 'fr', 'MC': 'fr', 'SN': 'fr',
+          'ES': 'es', 'MX': 'es', 'AR': 'es', 'CO': 'es', 'CL': 'es', 'PE': 'es', 'VE': 'es', 'EC': 'es',
+          'IT': 'it', 'SM': 'it', 'VA': 'it',
+          'NL': 'nl', 'SR': 'nl',
+          'PL': 'pl',
+          'CN': 'zh-CN', 'TW': 'zh-CN', 'HK': 'zh-CN', 'SG': 'zh-CN',
+          'JP': 'ja',
+          'RU': 'ru', 'BY': 'ru', 'KZ': 'ru',
+          'SA': 'ar', 'EG': 'ar', 'AE': 'ar', 'MA': 'ar', 'DZ': 'ar', 'IQ': 'ar', 'JO': 'ar', 'KW': 'ar', 'LB': 'ar', 'LY': 'ar', 'OM': 'ar', 'QA': 'ar', 'SY': 'ar', 'TN': 'ar', 'YE': 'ar',
+          'BD': 'bn',
+          'BR': 'pt', 'PT': 'pt', 'AO': 'pt', 'MZ': 'pt',
+          'IN': 'en'
+        };
 
-        function openLangModal() {
-          if (modal) {
-            modal.classList.add('lang-modal--open');
-            modal.setAttribute('aria-hidden', 'false');
-          }
+        function normalizeLang(code) {
+          if (!code) return '';
+          var lang = (code.split('-')[0] || '').toLowerCase();
+          if (code.indexOf('zh') === 0) return 'zh-CN';
+          return lang;
         }
 
-        function closeLangModal() {
-          if (modal) {
-            modal.classList.remove('lang-modal--open');
-            modal.setAttribute('aria-hidden', 'true');
+        function detectLanguage(cb) {
+          var lang = normalizeLang(navigator.language);
+          if (lang && SUPPORTED.indexOf(lang) !== -1 && lang !== 'es') {
+            return cb(lang);
           }
+          if (navigator.languages && navigator.languages.length) {
+            for (var i = 0; i < navigator.languages.length; i++) {
+              var l = normalizeLang(navigator.languages[i]);
+              if (l && SUPPORTED.indexOf(l) !== -1 && l !== 'es') return cb(l);
+            }
+          }
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', 'https://ipapi.co/json/', true);
+          xhr.timeout = 3000;
+          xhr.onload = function () {
+            try {
+              var data = JSON.parse(xhr.responseText);
+              var country = (data.country_code || '').toUpperCase();
+              var mapped = COUNTRY_TO_LANG[country];
+              if (mapped && mapped !== 'es') return cb(mapped);
+            } catch (e) {}
+            cb('');
+          };
+          xhr.onerror = xhr.ontimeout = function () { cb(''); };
+          xhr.send();
         }
 
         function setTranslateLanguage(langCode) {
@@ -429,33 +436,12 @@
               'google_translate_element'
             );
           }
-          if (!sessionStorage.getItem(LANG_STORAGE)) {
-            openLangModal();
-          }
-        }
-
-        if (langList) {
-          langList.addEventListener('click', function (e) {
-            var btn = e.target.closest('button[data-lang]');
-            if (btn) {
-              var lang = btn.getAttribute('data-lang');
-              sessionStorage.setItem(LANG_STORAGE, '1');
-              if (lang !== 'es') setTranslateLanguage(lang);
-              closeLangModal();
+          detectLanguage(function (lang) {
+            if (lang) {
+              setTimeout(function () { setTranslateLanguage(lang); }, 400);
             }
           });
         }
-        if (langSkip) {
-          langSkip.addEventListener('click', function () {
-            sessionStorage.setItem(LANG_STORAGE, '1');
-            closeLangModal();
-          });
-        }
-        if (langBtn) langBtn.addEventListener('click', openLangModal);
-
-        modal.addEventListener('click', function (e) {
-          if (e.target === modal) closeLangModal();
-        });
 
         var script = document.createElement('script');
         script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
