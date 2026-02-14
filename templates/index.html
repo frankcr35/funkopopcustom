@@ -353,100 +353,120 @@
       })();
     </script>
 
-    <!-- Traductor automático según ubicación / idioma del navegador -->
+    <!-- Traductor automático según ubicación / idioma del navegador (no bloquea la página) -->
     <script>
       (function () {
-        var SUPPORTED = ['en', 'zh-CN', 'hi', 'es', 'fr', 'ar', 'bn', 'pt', 'ru', 'ja', 'de', 'it', 'nl', 'pl'];
-        var COUNTRY_TO_LANG = {
-          'US': 'en', 'GB': 'en', 'AU': 'en', 'CA': 'en', 'IE': 'en', 'NZ': 'en', 'ZA': 'en',
-          'DE': 'de', 'AT': 'de', 'CH': 'de',
-          'FR': 'fr', 'BE': 'fr', 'LU': 'fr', 'MC': 'fr', 'SN': 'fr',
-          'ES': 'es', 'MX': 'es', 'AR': 'es', 'CO': 'es', 'CL': 'es', 'PE': 'es', 'VE': 'es', 'EC': 'es',
-          'IT': 'it', 'SM': 'it', 'VA': 'it',
-          'NL': 'nl', 'SR': 'nl',
-          'PL': 'pl',
-          'CN': 'zh-CN', 'TW': 'zh-CN', 'HK': 'zh-CN', 'SG': 'zh-CN',
-          'JP': 'ja',
-          'RU': 'ru', 'BY': 'ru', 'KZ': 'ru',
-          'SA': 'ar', 'EG': 'ar', 'AE': 'ar', 'MA': 'ar', 'DZ': 'ar', 'IQ': 'ar', 'JO': 'ar', 'KW': 'ar', 'LB': 'ar', 'LY': 'ar', 'OM': 'ar', 'QA': 'ar', 'SY': 'ar', 'TN': 'ar', 'YE': 'ar',
-          'BD': 'bn',
-          'BR': 'pt', 'PT': 'pt', 'AO': 'pt', 'MZ': 'pt',
-          'IN': 'en'
-        };
-
-        function normalizeLang(code) {
-          if (!code) return '';
-          var lang = (code.split('-')[0] || '').toLowerCase();
-          if (code.indexOf('zh') === 0) return 'zh-CN';
-          return lang;
-        }
-
-        function detectLanguage(cb) {
-          var lang = normalizeLang(navigator.language);
-          if (lang && SUPPORTED.indexOf(lang) !== -1 && lang !== 'es') {
-            return cb(lang);
-          }
-          if (navigator.languages && navigator.languages.length) {
-            for (var i = 0; i < navigator.languages.length; i++) {
-              var l = normalizeLang(navigator.languages[i]);
-              if (l && SUPPORTED.indexOf(l) !== -1 && l !== 'es') return cb(l);
-            }
-          }
-          var xhr = new XMLHttpRequest();
-          xhr.open('GET', 'https://ipapi.co/json/', true);
-          xhr.timeout = 3000;
-          xhr.onload = function () {
-            try {
-              var data = JSON.parse(xhr.responseText);
-              var country = (data.country_code || '').toUpperCase();
-              var mapped = COUNTRY_TO_LANG[country];
-              if (mapped && mapped !== 'es') return cb(mapped);
-            } catch (e) {}
-            cb('');
+        try {
+          var SUPPORTED = ['en', 'zh-CN', 'hi', 'es', 'fr', 'ar', 'bn', 'pt', 'ru', 'ja', 'de', 'it', 'nl', 'pl'];
+          var COUNTRY_TO_LANG = {
+            'US': 'en', 'GB': 'en', 'AU': 'en', 'CA': 'en', 'IE': 'en', 'NZ': 'en', 'ZA': 'en',
+            'DE': 'de', 'AT': 'de', 'CH': 'de',
+            'FR': 'fr', 'BE': 'fr', 'LU': 'fr', 'MC': 'fr', 'SN': 'fr',
+            'ES': 'es', 'MX': 'es', 'AR': 'es', 'CO': 'es', 'CL': 'es', 'PE': 'es', 'VE': 'es', 'EC': 'es',
+            'IT': 'it', 'SM': 'it', 'VA': 'it',
+            'NL': 'nl', 'SR': 'nl',
+            'PL': 'pl',
+            'CN': 'zh-CN', 'TW': 'zh-CN', 'HK': 'zh-CN', 'SG': 'zh-CN',
+            'JP': 'ja',
+            'RU': 'ru', 'BY': 'ru', 'KZ': 'ru',
+            'SA': 'ar', 'EG': 'ar', 'AE': 'ar', 'MA': 'ar', 'DZ': 'ar', 'IQ': 'ar', 'JO': 'ar', 'KW': 'ar', 'LB': 'ar', 'LY': 'ar', 'OM': 'ar', 'QA': 'ar', 'SY': 'ar', 'TN': 'ar', 'YE': 'ar',
+            'BD': 'bn',
+            'BR': 'pt', 'PT': 'pt', 'AO': 'pt', 'MZ': 'pt',
+            'IN': 'en'
           };
-          xhr.onerror = xhr.ontimeout = function () { cb(''); };
-          xhr.send();
-        }
 
-        function setTranslateLanguage(langCode) {
-          try {
-            var select = document.querySelector('.goog-te-combo');
-            if (select && select.options) {
-              for (var i = 0; i < select.options.length; i++) {
-                var opt = select.options[i];
-                if (opt.value && opt.value.indexOf(langCode) === 0) {
-                  select.value = opt.value;
-                  select.dispatchEvent(new Event('change'));
-                  break;
+          function normalizeLang(code) {
+            if (!code) return '';
+            var lang = (String(code).split('-')[0] || '').toLowerCase();
+            if (String(code).indexOf('zh') === 0) return 'zh-CN';
+            return lang;
+          }
+
+          function detectLanguage(cb) {
+            try {
+              var lang = normalizeLang(navigator.language);
+              if (lang && SUPPORTED.indexOf(lang) !== -1 && lang !== 'es') {
+                return cb(lang);
+              }
+              if (navigator.languages && navigator.languages.length) {
+                for (var i = 0; i < navigator.languages.length; i++) {
+                  var l = normalizeLang(navigator.languages[i]);
+                  if (l && SUPPORTED.indexOf(l) !== -1 && l !== 'es') return cb(l);
                 }
               }
+              var xhr = new XMLHttpRequest();
+              xhr.open('GET', 'https://ipapi.co/json/', true);
+              xhr.timeout = 3000;
+              xhr.onload = function () {
+                try {
+                  var data = JSON.parse(xhr.responseText);
+                  var country = (data.country_code || '').toUpperCase();
+                  var mapped = COUNTRY_TO_LANG[country];
+                  if (mapped && mapped !== 'es') return cb(mapped);
+                } catch (e) {}
+                cb('');
+              };
+              xhr.onerror = xhr.ontimeout = function () { cb(''); };
+              xhr.send();
+            } catch (e) {
+              cb('');
             }
-          } catch (e) {}
-        }
-
-        function googleTranslateElementInit() {
-          if (typeof google !== 'undefined' && google.translate) {
-            new google.translate.TranslateElement(
-              {
-                pageLanguage: 'es',
-                includedLanguages: 'en,zh-CN,hi,es,fr,ar,bn,pt,ru,ja,de,it,nl,pl',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                autoDisplay: false
-              },
-              'google_translate_element'
-            );
           }
-          detectLanguage(function (lang) {
-            if (lang) {
-              setTimeout(function () { setTranslateLanguage(lang); }, 400);
-            }
-          });
-        }
 
-        var script = document.createElement('script');
-        script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-        script.async = true;
-        document.head.appendChild(script);
+          function setTranslateLanguage(langCode) {
+            try {
+              var select = document.querySelector('.goog-te-combo');
+              if (select && select.options) {
+                for (var i = 0; i < select.options.length; i++) {
+                  var opt = select.options[i];
+                  if (opt.value && opt.value.indexOf(langCode) === 0) {
+                    select.value = opt.value;
+                    select.dispatchEvent(new Event('change'));
+                    break;
+                  }
+                }
+              }
+            } catch (e) {}
+          }
+
+          function googleTranslateElementInit() {
+            try {
+              if (typeof google !== 'undefined' && google.translate) {
+                new google.translate.TranslateElement(
+                  {
+                    pageLanguage: 'es',
+                    includedLanguages: 'en,zh-CN,hi,es,fr,ar,bn,pt,ru,ja,de,it,nl,pl',
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                    autoDisplay: false
+                  },
+                  'google_translate_element'
+                );
+              }
+              detectLanguage(function (lang) {
+                if (lang) {
+                  setTimeout(function () { setTranslateLanguage(lang); }, 400);
+                }
+              });
+            } catch (e) {}
+          }
+
+          var el = document.getElementById('google_translate_element');
+          if (!el) return;
+          function loadTranslate() {
+            try {
+              var script = document.createElement('script');
+              script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+              script.async = true;
+              script.onerror = function () {};
+              (document.head || document.documentElement).appendChild(script);
+            } catch (err) {}
+          }
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadTranslate);
+          } else {
+            setTimeout(loadTranslate, 0);
+          }
+        } catch (e) {}
       })();
     </script>
   </body>
