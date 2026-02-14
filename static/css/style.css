@@ -1689,22 +1689,28 @@ details.grupo[open] .grupo__resto {
     grid-row: auto;
   }
 
+  /* Vídeo: se ve entero, sin recortar */
   .hero__col--video .hero__video-wrap {
     max-width: 100%;
-    max-height: 140px;
-    overflow: hidden;
+    margin: 0 auto;
   }
 
   .hero__col--video .hero__video {
     width: 100%;
-    height: 140px;
-    object-fit: cover;
+    height: auto;
+    max-height: 240px;
+    object-fit: contain;
+    display: block;
   }
 
+  /* Foto principal: cuadrada y del mismo tamaño que las imágenes de "Cómo funciona" */
   .hero__col--img .hero__image-wrap {
-    height: 120px;
-    max-width: 100%;
+    width: 48%;
+    max-width: 175px;
+    aspect-ratio: 1;
+    margin: 0 auto;
     overflow: hidden;
+    border-radius: var(--radius-lg);
   }
 
   .hero__col--img .hero__image-wrap img {
